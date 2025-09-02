@@ -111,6 +111,10 @@ public class PrometeoCarController : MonoBehaviour
       [Space(10)]
       //The following variables lets you to set up touch controls for mobile devices.
       public bool useTouchControls = false;
+      
+      [Space(10)]
+      //External control variables
+      public bool useExternalControl = false;
       public GameObject throttleButton;
       PrometeoTouchInput throttlePTI;
       public GameObject reverseButton;
@@ -144,6 +148,11 @@ public class PrometeoCarController : MonoBehaviour
       float localVelocityX;
       bool deceleratingCar;
       bool touchControlsSetup = false;
+      
+      // External control variables
+      float externalThrottleInput = 0f;
+      float externalSteeringInput = 0f;
+      bool externalHandbrakeInput = false;
       /*
       The following variables are used to store information about sideways friction of the wheels (such as
       extremumSlip,extremumValue, asymptoteSlip, asymptoteValue and stiffness). We change this values to
@@ -278,8 +287,8 @@ public class PrometeoCarController : MonoBehaviour
       //CAR PHYSICS
 
       /*
-      The next part is regarding to the car controller. First, it checks if the user wants to use touch controls (for
-      mobile devices) or analog input controls (WASD + Space).
+      The next part is regarding to the car controller. First, it checks if the user wants to use external control,
+      touch controls (for mobile devices) or analog input controls (WASD + Space).
 
       The following methods are called whenever a certain key is pressed. For example, in the first 'if' we call the
       method GoForward() if the user has pressed W.
@@ -287,7 +296,9 @@ public class PrometeoCarController : MonoBehaviour
       In this part of the code we specify what the car needs to do if the user presses W (throttle), S (reverse),
       A (turn left), D (turn right) or Space bar (handbrake).
       */
-      if (useTouchControls && touchControlsSetup){
+      if (useExternalControl){
+        HandleExternalControl();
+      }else if (useTouchControls && touchControlsSetup){
 
         if(throttlePTI.buttonPressed){
           CancelInvoke("DecelerateCar");
@@ -769,6 +780,92 @@ public class PrometeoCarController : MonoBehaviour
 
         driftingAxis = 0f;
       }
+    }
+
+    //
+    // EXTERNAL CONTROL METHODS
+    //
+
+    void HandleExternalControl()
+    {
+      // Debug log to check if this method is being called
+      if(Time.frameCount % 60 == 0) // Log every 60 frames to avoid spam
+      {
+        Debug.Log($"HandleExternalControl: throttle={externalThrottleInput:F2}, steering={externalSteeringInput:F2}");
+      }
+
+      // Handle throttle input
+      if(externalThrottleInput > 0.1f)
+      {
+        CancelInvoke("DecelerateCar");
+        deceleratingCar = false;
+        GoForward();
+      }
+      else if(externalThrottleInput < -0.1f)
+      {
+        CancelInvoke("DecelerateCar");
+        deceleratingCar = false;
+        GoReverse();
+      }
+      else
+      {
+        ThrottleOff();
+        if(!deceleratingCar && !externalHandbrakeInput)
+        {
+          InvokeRepeating("DecelerateCar", 0f, 0.1f);
+          deceleratingCar = true;
+        }
+      }
+
+      // Handle steering input - Set steering axis directly for external control
+      steeringAxis = externalSteeringInput;
+      var steeringAngle = steeringAxis * maxSteeringAngle;
+      frontLeftCollider.steerAngle = Mathf.Lerp(frontLeftCollider.steerAngle, steeringAngle, steeringSpeed);
+      frontRightCollider.steerAngle = Mathf.Lerp(frontRightCollider.steerAngle, steeringAngle, steeringSpeed);
+
+      // Handle handbrake input
+      if(externalHandbrakeInput)
+      {
+        CancelInvoke("DecelerateCar");
+        deceleratingCar = false;
+        Handbrake();
+      }
+      else
+      {
+        RecoverTraction();
+      }
+    }
+
+    // Public methods for external control
+    public void SetExternalThrottleInput(float input)
+    {
+      externalThrottleInput = Mathf.Clamp(input, -1f, 1f);
+    }
+
+    public void SetExternalSteeringInput(float input)
+    {
+      externalSteeringInput = Mathf.Clamp(input, -1f, 1f);
+    }
+
+    public void SetExternalHandbrakeInput(bool input)
+    {
+      externalHandbrakeInput = input;
+    }
+
+    // Getter methods for external access
+    public float GetCurrentSpeed()
+    {
+      return carSpeed;
+    }
+
+    public bool GetIsDrifting()
+    {
+      return isDrifting;
+    }
+
+    public bool GetIsTractionLocked()
+    {
+      return isTractionLocked;
     }
 
 }
