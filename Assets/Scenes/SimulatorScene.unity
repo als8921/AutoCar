@@ -862,7 +862,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4466888475822015697, guid: 79d0ca8b77e301442afdb49f102e8aed, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.3395737
+      value: 1.25
       objectReference: {fileID: 0}
     - target: {fileID: 4466888475822015697, guid: 79d0ca8b77e301442afdb49f102e8aed, type: 3}
       propertyPath: m_LocalScale.y
@@ -882,7 +882,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6399581921715410368, guid: 79d0ca8b77e301442afdb49f102e8aed, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.3395737
+      value: 1.25
       objectReference: {fileID: 0}
     - target: {fileID: 6399581921715410368, guid: 79d0ca8b77e301442afdb49f102e8aed, type: 3}
       propertyPath: m_LocalScale.y
@@ -939,6 +939,11 @@ MonoBehaviour:
   targetSteerAngle: 0
   useExternalControl: 1
   showDebugInfo: 1
+  useROSControl: 0
+  speedTopicName: /car_control/speed
+  steeringTopicName: /car_control/steering
+  rosDataTimeout: 1
+  modeSwitchKey: 116
 --- !u!1001 &1416532269
 PrefabInstance:
   m_ObjectHideFlags: 0
