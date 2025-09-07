@@ -985,8 +985,24 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 100002, guid: 6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c, type: 3}
+      propertyPath: minRange
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 100002, guid: 6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c, type: 3}
       propertyPath: showPointCloud
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 100002, guid: 6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c, type: 3}
+      propertyPath: maxVisualizationPoints
+      value: 1000000
+      objectReference: {fileID: 0}
+    - target: {fileID: 100002, guid: 6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c, type: 3}
+      propertyPath: verticalAngularResolution
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 100002, guid: 6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c, type: 3}
+      propertyPath: horizontalAngularResolution
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
