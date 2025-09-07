@@ -33,6 +33,9 @@ public class ExternalCarController : MonoBehaviour
     
     void Update()
     {
+        // Handle keyboard input
+        HandleKeyboardInput();
+        
         if (useExternalControl && carController != null)
         {
             // Apply external control
@@ -87,5 +90,51 @@ public class ExternalCarController : MonoBehaviour
     public Vector3 GetVelocity()
     {
         return carController != null ? carController.GetComponent<Rigidbody>().velocity : Vector3.zero;
+    }
+    
+    // Keyboard input handling
+    void HandleKeyboardInput()
+    {
+        // R key - Reset car position and velocity
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ResetCarPosition();
+            ResetControlInputs();
+        }
+        
+        // Space key - Reset control inputs
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            ResetControlInputs();
+        }
+    }
+    
+    // Reset car position to origin and stop all movement
+    void ResetCarPosition()
+    {
+        if (carController == null) return;
+        
+        // Reset position to origin
+        transform.position = Vector3.zero;
+        transform.rotation = Quaternion.identity;
+        
+        // Reset velocity and angular velocity
+        Rigidbody rb = carController.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+        
+        Debug.Log("Car position and velocity reset to origin!");
+    }
+    
+    // Reset control inputs to zero
+    void ResetControlInputs()
+    {
+        targetSpeed = 0f;
+        targetSteerAngle = 0f;
+        
+        Debug.Log("Control inputs reset - Speed: 0, Steer: 0");
     }
 }
