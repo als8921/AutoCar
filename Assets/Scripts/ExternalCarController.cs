@@ -1,10 +1,12 @@
 using UnityEngine;
+using Unity.Robotics.ROSTCPConnector;
+using RosMessageTypes.Std;
 
 public class ExternalCarController : MonoBehaviour
 {
     [Header("Car Control Parameters")]
     [Range(-1f, 1f)]
-    public float targetSpeed = 0f; // -1 (full reverse) to 1 (full forward) - Default 0.5 for testing
+    public float targetSpeed = 0f; // -1 (full reverse) to 1 (full forward)
     
     [Range(-1f, 1f)]
     public float targetSteerAngle = 0f; // -1 (full left) to 1 (full right)
@@ -13,7 +15,19 @@ public class ExternalCarController : MonoBehaviour
     public bool useExternalControl = true;
     public bool showDebugInfo = true;
     
+    [Header("ROS2 Control Settings")]
+    public bool useROSControl = false; // ROS 모드 활성화 여부
+    public string speedTopicName = "/car_control/speed";
+    public string steeringTopicName = "/car_control/steering";
+    public float rosDataTimeout = 1.0f; // ROS 데이터 타임아웃 (초)
+    
+    [Header("Mode Switching")]
+    public KeyCode modeSwitchKey = KeyCode.T; // 모드 전환 키
+    
     private PrometeoCarController carController;
+    private ROSConnection ros;
+    private float lastROSDataTime = 0f;
+    private bool rosDataReceived = false;
     
     void Start()
     {
@@ -28,13 +42,35 @@ public class ExternalCarController : MonoBehaviour
         // Enable external control on the PrometeoCarController
         carController.useExternalControl = true;
         
-        Debug.Log("ExternalCarController initialized successfully!");
+        // 초기값을 0으로 확실히 설정
+        targetSpeed = 0f;
+        targetSteerAngle = 0f;
+        
+        // ROS 연결 초기화
+        if (useROSControl)
+        {
+            InitializeROS();
+        }
+        
+        Debug.Log($"ExternalCarController initialized successfully! Mode: {(useROSControl ? "ROS" : "Keyboard")}");
     }
     
     void Update()
     {
-        // Handle keyboard input
-        HandleKeyboardInput();
+        // Handle mode switching
+        HandleModeSwitching();
+        
+        // Update control values based on current mode
+        if (useROSControl)
+        {
+            // ROS 모드: ROS 메시지로만 제어 (targetSpeed, targetSteerAngle은 ROS 콜백에서 설정됨)
+            CheckROSDataTimeout();
+        }
+        else
+        {
+            // 키보드 모드: 키보드 입력으로 targetSpeed, targetSteerAngle 설정
+            HandleKeyboardInput();
+        }
         
         if (useExternalControl && carController != null)
         {
@@ -62,7 +98,18 @@ public class ExternalCarController : MonoBehaviour
     
     void ShowDebugInfo()
     {
-        Debug.Log($"External Control - Speed: {targetSpeed:F2}, Steer: {targetSteerAngle:F2}, Car Speed: {carController.carSpeed:F1} km/h, UseExternal: {carController.useExternalControl}");
+        string mode = useROSControl ? "ROS" : "Keyboard";
+        string rosStatus = useROSControl ? (rosDataReceived ? "Connected" : "No Data") : "N/A";
+        string keyStatus = "";
+        
+        // 현재 눌린 키 표시
+        if (Input.GetKey(KeyCode.W)) keyStatus += "W ";
+        if (Input.GetKey(KeyCode.S)) keyStatus += "S ";
+        if (Input.GetKey(KeyCode.A)) keyStatus += "A ";
+        if (Input.GetKey(KeyCode.D)) keyStatus += "D ";
+        if (string.IsNullOrEmpty(keyStatus)) keyStatus = "None";
+        
+        Debug.Log($"[{mode} Mode] Speed: {targetSpeed:F2}, Steer: {targetSteerAngle:F2}, Car Speed: {carController.carSpeed:F1} km/h, Keys: {keyStatus}, ROS Status: {rosStatus}");
     }
     
     // Public methods for external control
@@ -155,12 +202,8 @@ public class ExternalCarController : MonoBehaviour
         }
         else
         {
-            // Gradually return to 0 when no key is pressed
-            targetSpeed = Mathf.Lerp(targetSpeed, 0f, Time.deltaTime * 5f);
-            if (Mathf.Abs(targetSpeed) < 0.01f)
-            {
-                targetSpeed = 0f;
-            }
+            // 즉시 0으로 설정 (점진적 감소 제거)
+            targetSpeed = 0f;
         }
         
         // Steering control with A/D keys
@@ -174,11 +217,128 @@ public class ExternalCarController : MonoBehaviour
         }
         else
         {
-            // Gradually return to 0 when no key is pressed
-            targetSteerAngle = Mathf.Lerp(targetSteerAngle, 0f, Time.deltaTime * 5f);
-            if (Mathf.Abs(targetSteerAngle) < 0.01f)
+            // 즉시 0으로 설정 (점진적 감소 제거)
+            targetSteerAngle = 0f;
+        }
+    }
+    
+    // ROS 관련 메서드들
+    void InitializeROS()
+    {
+        try
+        {
+            ros = ROSConnection.GetOrCreateInstance();
+            ros.Subscribe<Float32Msg>(speedTopicName, OnSpeedMessageReceived);
+            ros.Subscribe<Float32Msg>(steeringTopicName, OnSteeringMessageReceived);
+            
+            Debug.Log($"ROS initialized - Speed Topic: {speedTopicName}, Steering Topic: {steeringTopicName}");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Failed to initialize ROS: {e.Message}");
+            useROSControl = false;
+        }
+    }
+    
+    void OnSpeedMessageReceived(Float32Msg message)
+    {
+        targetSpeed = Mathf.Clamp(message.data, -1f, 1f);
+        lastROSDataTime = Time.time;
+        rosDataReceived = true;
+        
+        if (showDebugInfo)
+        {
+            Debug.Log($"[ROS] Speed received: {targetSpeed:F2}");
+        }
+    }
+    
+    void OnSteeringMessageReceived(Float32Msg message)
+    {
+        targetSteerAngle = Mathf.Clamp(message.data, -1f, 1f);
+        lastROSDataTime = Time.time;
+        rosDataReceived = true;
+        
+        if (showDebugInfo)
+        {
+            Debug.Log($"[ROS] Steering received: {targetSteerAngle:F2}");
+        }
+    }
+    
+    void CheckROSDataTimeout()
+    {
+        if (Time.time - lastROSDataTime > rosDataTimeout)
+        {
+            if (rosDataReceived)
             {
+                Debug.LogWarning("[ROS] Data timeout - switching to safe mode (stopping car)");
+                targetSpeed = 0f;
                 targetSteerAngle = 0f;
+                rosDataReceived = false;
+            }
+        }
+    }
+    
+    void HandleModeSwitching()
+    {
+        if (Input.GetKeyDown(modeSwitchKey))
+        {
+            ToggleControlMode();
+        }
+    }
+    
+    public void ToggleControlMode()
+    {
+        useROSControl = !useROSControl;
+        
+        if (useROSControl)
+        {
+            // ROS 모드로 전환
+            if (ros == null)
+            {
+                InitializeROS();
+            }
+            ResetControlInputs();
+            Debug.Log("Switched to ROS control mode");
+        }
+        else
+        {
+            // 키보드 모드로 전환
+            ResetControlInputs();
+            Debug.Log("Switched to keyboard control mode");
+        }
+    }
+    
+    public void SetControlMode(bool useROS)
+    {
+        if (useROSControl != useROS)
+        {
+            ToggleControlMode();
+        }
+    }
+    
+    public bool IsROSControlActive()
+    {
+        return useROSControl && rosDataReceived;
+    }
+    
+    public bool IsKeyboardControlActive()
+    {
+        return !useROSControl;
+    }
+    
+    void OnDestroy()
+    {
+        // ROS 구독 해제
+        if (ros != null)
+        {
+            try
+            {
+                ros.Unsubscribe(speedTopicName);
+                ros.Unsubscribe(steeringTopicName);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"Error unsubscribing from ROS topics: {e.Message}");
             }
         }
     }
