@@ -523,6 +523,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 100001, guid: 6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c, type: 3}
   m_PrefabInstance: {fileID: 1416532269}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &836911032 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 100002, guid: 6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c, type: 3}
+  m_PrefabInstance: {fileID: 1416532269}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a8b9c5d1e2f3a4b5c6d7e8f9a0b1c2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &891501974 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 642287924342879162, guid: 79d0ca8b77e301442afdb49f102e8aed, type: 3}
@@ -1134,6 +1145,7 @@ GameObject:
   - component: {fileID: 1819325560}
   - component: {fileID: 1819325562}
   - component: {fileID: 1819325563}
+  - component: {fileID: 1819325564}
   m_Layer: 0
   m_Name: ROSConnector
   m_TagString: Untagged
@@ -1212,6 +1224,27 @@ MonoBehaviour:
   targetCamera: {fileID: 620936537}
   flipImageVertically: 0
   jpegQuality: 80
+--- !u!114 &1819325564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1819325559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69b8c8807151e49bc926f3e5ea555bc4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topicName: /lidar/pointcloud
+  publishFrequency: 12
+  lidarSensor: {fileID: 836911032}
+  maxPointsPerMessage: 50000
+  enablePointCloudPublishing: 1
+  useLidarFrame: 1
+  frameId: lidar_link
+  enableDebugLogging: 1
+  logInterval: 2
 --- !u!1 &1874616412
 GameObject:
   m_ObjectHideFlags: 0
