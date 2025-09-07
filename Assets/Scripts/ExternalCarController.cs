@@ -95,6 +95,9 @@ public class ExternalCarController : MonoBehaviour
     // Keyboard input handling
     void HandleKeyboardInput()
     {
+        // Handle WASD input for direct control
+        HandleWASDInput();
+        
         // R key - Reset car position and velocity
         if (Input.GetKeyDown(KeyCode.R))
         {
@@ -136,5 +139,47 @@ public class ExternalCarController : MonoBehaviour
         targetSteerAngle = 0f;
         
         Debug.Log("Control inputs reset - Speed: 0, Steer: 0");
+    }
+    
+    // Handle WASD keyboard input for direct control
+    void HandleWASDInput()
+    {
+        // Speed control with W/S keys
+        if (Input.GetKey(KeyCode.W))
+        {
+            targetSpeed = 1f; // Forward
+        }
+        else if (Input.GetKey(KeyCode.S))
+        {
+            targetSpeed = -1f; // Reverse
+        }
+        else
+        {
+            // Gradually return to 0 when no key is pressed
+            targetSpeed = Mathf.Lerp(targetSpeed, 0f, Time.deltaTime * 5f);
+            if (Mathf.Abs(targetSpeed) < 0.01f)
+            {
+                targetSpeed = 0f;
+            }
+        }
+        
+        // Steering control with A/D keys
+        if (Input.GetKey(KeyCode.A))
+        {
+            targetSteerAngle = -1f; // Turn left
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            targetSteerAngle = 1f; // Turn right
+        }
+        else
+        {
+            // Gradually return to 0 when no key is pressed
+            targetSteerAngle = Mathf.Lerp(targetSteerAngle, 0f, Time.deltaTime * 5f);
+            if (Mathf.Abs(targetSteerAngle) < 0.01f)
+            {
+                targetSteerAngle = 0f;
+            }
+        }
     }
 }
