@@ -738,8 +738,16 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 627556911, guid: 79d0ca8b77e301442afdb49f102e8aed, type: 3}
+      propertyPath: useUI
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 627556911, guid: 79d0ca8b77e301442afdb49f102e8aed, type: 3}
       propertyPath: maxSpeed
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 627556911, guid: 79d0ca8b77e301442afdb49f102e8aed, type: 3}
+      propertyPath: useEffects
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 627556911, guid: 79d0ca8b77e301442afdb49f102e8aed, type: 3}
       propertyPath: RLWTireSkid
@@ -889,14 +897,14 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 642287924342879162, guid: 79d0ca8b77e301442afdb49f102e8aed, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1303524228}
+      addedObject: {fileID: 1303524231}
   m_SourcePrefab: {fileID: 100100000, guid: 79d0ca8b77e301442afdb49f102e8aed, type: 3}
 --- !u!4 &1303524225 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 261786959625234688, guid: 79d0ca8b77e301442afdb49f102e8aed, type: 3}
   m_PrefabInstance: {fileID: 1303524224}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1303524228
+--- !u!114 &1303524231
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -905,7 +913,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 891501974}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d25d826913d6469fa75350bbb12b3f7, type: 3}
+  m_Script: {fileID: 11500000, guid: d8abcc6ca75e141e99b59a152374fcdc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   targetSpeed: 0

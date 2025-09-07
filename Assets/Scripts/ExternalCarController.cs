@@ -4,7 +4,7 @@ public class ExternalCarController : MonoBehaviour
 {
     [Header("Car Control Parameters")]
     [Range(-1f, 1f)]
-    public float targetSpeed = 0.5f; // -1 (full reverse) to 1 (full forward) - Default 0.5 for testing
+    public float targetSpeed = 0f; // -1 (full reverse) to 1 (full forward) - Default 0.5 for testing
     
     [Range(-1f, 1f)]
     public float targetSteerAngle = 0f; // -1 (full left) to 1 (full right)
