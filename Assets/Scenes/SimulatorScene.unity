@@ -1190,7 +1190,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topicName: /object_pose
-  publishFrequency: 10
+  publishFrequency: 30
   targetObject: {fileID: 1303524225}
   useWorldCoordinates: 1
 --- !u!114 &1819325563
@@ -1205,12 +1205,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ca68ab83f029425994a1b9f8ca5abe1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topicName: /camera/image_raw
+  topicName: /camera/image_raw/compressed
   publishFrequency: 30
   imageWidth: 640
   imageHeight: 480
   targetCamera: {fileID: 620936537}
-  flipImageVertically: 1
+  flipImageVertically: 0
   jpegQuality: 80
 --- !u!1 &1874616412
 GameObject:
